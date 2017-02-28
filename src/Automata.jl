@@ -1,14 +1,13 @@
-module DirectedControl
+#__precompile__(true)
 
+module Automata
 export
-    # Type defs that can be used elsewhere
-    Automaton,
-    Automata,
+    # Automaton
+    Automaton, State, Event, Transition, states, ns
 
-    # Function definitions
-    synch
+Automata
 
-## source files
+# source files
 include("automaton.jl")
 #include("automata.jl")
 
