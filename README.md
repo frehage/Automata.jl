@@ -1,9 +1,10 @@
-# Directed Control Implementation and Experiments #
+# Automata.jl #
 
-In this repo I experiment with old and new algorithms for directed control.
+Automata.jl is a Julia package that provides a syntax and some basic functionality for [Automata theory](https://en.wikipedia.org/wiki/Automata_theory). The implementation is built ontop of the graph library [LightGraphs.jl](https://github.com/JuliaGraphs/LightGraphs.jl).
 
-## Details ##
+## Core features ##
 
-The code is mainly built using Julia Programming. The following is required in order to run it fully:
-* julia
+
+* Automaton
+ A
 * 	...
