@@ -3,7 +3,8 @@
 module Automata
 export
     # Automaton
-    Automaton, State, Event, Transition, states, ns
+    Automaton, State, Event, Transition, states, ns,
+    add_state!, add_states!, rem_state!, rem_states!
 
 Automata
 

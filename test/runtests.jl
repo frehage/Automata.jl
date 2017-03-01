@@ -11,3 +11,4 @@ for t in tests
     println("running test for: $(t).jl ...")
     include(tp)
 end
+println("done testing ...")

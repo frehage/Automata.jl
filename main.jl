@@ -5,9 +5,5 @@
 ##################
 workspace()
 
-try
-    include("src/Automata.jl")
-    include("test/runtests.jl")
-catch e
-    print(e)
-end
+include("src/Automata.jl")
+include("test/runtests.jl")

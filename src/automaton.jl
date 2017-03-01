@@ -9,19 +9,19 @@ typealias Transition Tuple{State,Event,State}
 type Automaton
 
     """Parameters"""
-    states::Set{State}
-    events::Set{Event}
+    states::IntSet
+    events::IntSet
     transitions::Set{Transition}
-    init::Set{State}
-    marked::Set{State}
+    init::IntSet
+    marked::IntSet
 
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
     function Automaton(
-            states::Set{State},
-            events::Set{Event},
+            states::IntSet,
+            events::IntSet,
             transitions::Set{Transition},
-            init::Set{State},
-            marked::Set{State}
+            init::IntSet,
+            marked::IntSet
         )
 
         # Verify transitions
@@ -48,8 +48,7 @@ type Automaton
         new(states, events, transitions, init, marked)
     end
 end
-Automaton(nq::Int) = Automaton(Set{State}(1:nq), Set{Event}(), Set{Transition}(), Set{State}(), Set{State}())
-Automaton(nq::Int) = Automaton(Set{State}(1:nq), Set{Event}(), Set{Transition}(), Set{State}(), Set{State}())
+Automaton(nq::Int) = Automaton(IntSet(1:nq), IntSet(), Set{Transition}(), IntSet(), IntSet())
 Automaton() = Automaton(0)
 
 
@@ -58,3 +57,15 @@ states(a::Automaton) = a.states
 
 """Return the number of states in an automaton."""
 ns(a::Automaton) = length(states(a))
+
+"""Add one state to the automaton."""
+add_state!(a::Automaton, state::State) = push!(a.states, state)
+"""Add set of states to the automaton."""
+add_states!(a::Automaton, states::IntSet) = union!(a.states, states)
+add_states!(a::Automaton, states::Array{Int}) = add_states!(a, IntSet(states))
+
+"""Remove one state from the automaton."""
+rem_state!(a::Automaton, state::State) = setdiff!(a.states, state)
+"""Remove a set of states from the automaton."""
+rem_states!(a::Automaton, states::IntSet) = setdiff!(a.states, states)
+rem_states!(a::Automaton, states::Array{Int}) = rem_states!(a, IntSet(states))

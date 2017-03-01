@@ -1,31 +1,39 @@
-
-a1 = Automaton()
-a2 = Automaton(5)
-
+######################################
 # Testset for the type Automaton.
-@testset "Automaton" begin
+######################################
 
-    @testset "Automaton.constructors" begin
+###
+# Test the constructors and the generated objects
+###
 
-        @testset "Automaton.parameters" begin
-            @test a1.states == states(a1) == Set{State}()
-            @test a2.states == states(a2) == Set{State}(1:5)
-            @test ns(a1) == length(states(a1)) == 0
-            @test ns(a2) == length(states(a2)) == 5
-        end
+# Test the parameter values of newly created objects
+a = Automaton()
+@test a.states == states(a) == IntSet()
+@test ns(a) == length(states(a)) == 0
+a = Automaton(5)
+@test a.states == states(a) == IntSet(1:5)
+@test ns(a) == length(states(a)) == 5
 
-        # Test the input value assertion.
-        @testset "InputValueConsistency" begin
-            # Test transitions.
-            @test_throws ArgumentError Automaton(Set{State}([1]), Set{Event}([1]), Set{Transition}([(1,1,2)]), Set{State}(), Set{State}())
-            @test_throws ArgumentError Automaton(Set{State}([1]), Set{Event}([1]), Set{Transition}([(2,1,1)]), Set{State}(), Set{State}())
-            @test_throws ArgumentError Automaton(Set{State}([1]), Set{Event}([1]), Set{Transition}([(1,2,1)]), Set{State}(), Set{State}())
+# Test transitions.
+@test_throws ArgumentError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(1,1,2)]), IntSet(), IntSet())
+@test_throws ArgumentError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(2,1,1)]), IntSet(), IntSet())
+@test_throws ArgumentError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(1,2,1)]), IntSet(), IntSet())
+# Test init states.
+@test_throws ArgumentError Automaton(IntSet(), IntSet(), Set{Transition}(), IntSet([1]), IntSet())
+# Test marked states.
+@test_throws ArgumentError Automaton(IntSet(), IntSet(), Set{Transition}(), IntSet(), IntSet([1]))
 
-            # Test init states.
-            @test_throws ArgumentError Automaton(Set{State}(), Set{Event}(), Set{Transition}(), Set{State}([1]), Set{State}())
+###
+# Test the different functions
+###
 
-            # Test marked states.
-            @test_throws ArgumentError Automaton(Set{State}(), Set{Event}(), Set{Transition}(), Set{State}(), Set{State}([1]))
-        end
-    end
-end
+a = Automaton()
+# Test manipulation of states.
+@test add_state!(a, 1) == IntSet([1])
+@test add_state!(a, 1) == IntSet([1])
+@test add_states!(a, IntSet([6,9])) == IntSet([1, 6, 9])
+@test add_states!(a, [7,8]) == IntSet([1, 6, 7, 8, 9])
+@test rem_state!(a, 1) == IntSet([6, 7, 8, 9])
+@test rem_state!(a, 1) == IntSet([6, 7, 8, 9])
+@test rem_states!(a, IntSet([6,9])) == IntSet([7, 8])
+@test rem_states!(a, [7,8]) == IntSet()
