@@ -52,9 +52,12 @@ Automaton(nq::Int) = Automaton(IntSet(1:nq), IntSet(), Set{Transition}(), IntSet
 Automaton() = Automaton(0)
 
 
+
+#
+# States
+#
 """Return the states of an automaton."""
 states(a::Automaton) = a.states
-
 """Return the number of states in an automaton."""
 ns(a::Automaton) = length(states(a))
 
@@ -62,10 +65,30 @@ ns(a::Automaton) = length(states(a))
 add_state!(a::Automaton, state::State) = push!(a.states, state)
 """Add set of states to the automaton."""
 add_states!(a::Automaton, states::IntSet) = union!(a.states, states)
-add_states!(a::Automaton, states::Array{Int}) = add_states!(a, IntSet(states))
-
+add_states!(a::Automaton, states::Array{State}) = add_states!(a, IntSet(states))
 """Remove one state from the automaton."""
 rem_state!(a::Automaton, state::State) = setdiff!(a.states, state)
 """Remove a set of states from the automaton."""
 rem_states!(a::Automaton, states::IntSet) = setdiff!(a.states, states)
-rem_states!(a::Automaton, states::Array{Int}) = rem_states!(a, IntSet(states))
+rem_states!(a::Automaton, states::Array{State}) = rem_states!(a, IntSet(states))
+
+
+
+#
+# Events
+#
+"""Return the events of an automaton."""
+events(a::Automaton) = a.events
+"""Return the number of events in an automaton."""
+ne(a::Automaton) = length(events(a))
+
+"""Add one event to the automaton."""
+add_event!(a::Automaton, event::Event) = push!(a.events, event)
+"""Add set of events to the automaton."""
+add_events!(a::Automaton, events::IntSet) = union!(a.events, events)
+add_events!(a::Automaton, events2::Array{Int}) = add_events!(a, IntSet(events2))
+"""Remove one event from the automaton."""
+rem_event!(a::Automaton, event::Event) = setdiff!(a.events, event)
+"""Remove a set of events from the automaton."""
+rem_events!(a::Automaton, events::IntSet) = setdiff!(a.events, events)
+rem_events!(a::Automaton, events::Array{Int}) = rem_states!(a, IntSet(events))

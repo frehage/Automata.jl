@@ -27,8 +27,8 @@ a = Automaton(5)
 # Test the different functions
 ###
 
-a = Automaton()
 # Test manipulation of states.
+a = Automaton()
 @test add_state!(a, 1) == IntSet([1])
 @test add_state!(a, 1) == IntSet([1])
 @test add_states!(a, IntSet([6,9])) == IntSet([1, 6, 9])
@@ -37,3 +37,14 @@ a = Automaton()
 @test rem_state!(a, 1) == IntSet([6, 7, 8, 9])
 @test rem_states!(a, IntSet([6,9])) == IntSet([7, 8])
 @test rem_states!(a, [7,8]) == IntSet()
+
+# Test manipulation of events.
+a = Automaton()
+@test add_event!(a, 1) == IntSet([1])
+@test add_event!(a, 1) == IntSet([1])
+@test add_events!(a, IntSet([6,9])) == IntSet([1, 6, 9])
+@test add_events!(a, [7,8]) == IntSet([1, 6, 7, 8, 9])
+@test rem_event!(a, 1) == IntSet([6, 7, 8, 9])
+@test rem_event!(a, 1) == IntSet([6, 7, 8, 9])
+@test rem_events!(a, IntSet([6,9])) == IntSet([7, 8])
+@test rem_events!(a, [7,8]) == IntSet()
