@@ -15,13 +15,13 @@ a = Automaton(5)
 @test ns(a) == length(states(a)) == 5
 
 # Test transitions.
-@test_throws ArgumentError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(1,1,2)]), IntSet(), IntSet())
-@test_throws ArgumentError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(2,1,1)]), IntSet(), IntSet())
-@test_throws ArgumentError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(1,2,1)]), IntSet(), IntSet())
+@test_throws BoundsError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(1,1,2)]), IntSet(), IntSet())
+@test_throws BoundsError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(2,1,1)]), IntSet(), IntSet())
+@test_throws BoundsError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(1,2,1)]), IntSet(), IntSet())
 # Test init states.
-@test_throws ArgumentError Automaton(IntSet(), IntSet(), Set{Transition}(), IntSet([1]), IntSet())
+@test_throws BoundsError Automaton(IntSet(), IntSet(), Set{Transition}(), IntSet([1]), IntSet())
 # Test marked states.
-@test_throws ArgumentError Automaton(IntSet(), IntSet(), Set{Transition}(), IntSet(), IntSet([1]))
+@test_throws BoundsError Automaton(IntSet(), IntSet(), Set{Transition}(), IntSet(), IntSet([1]))
 
 ###
 # Test the different functions
@@ -48,3 +48,16 @@ a = Automaton()
 @test rem_event!(a, 1) == IntSet([6, 7, 8, 9])
 @test rem_events!(a, IntSet([6,9])) == IntSet([7, 8])
 @test rem_events!(a, [7,8]) == IntSet()
+
+# Test manipulation of transitions.
+a = Automaton()
+add_states!(a,[1,2,3])
+add_events!(a,[1,2])
+@test add_transition!(a, (1,1,1)) == Set{Transition}([(1,1,1)])
+@test add_transition!(a, (1,1,1)) == Set{Transition}([(1,1,1)])
+@test add_transitions!(a, Set{Transition}([(1,1,2),(1,2,2)])) == Set{Transition}([(1,1,1), (1,1,2), (1,2,2)])
+@test add_transitions!(a, [(1,1,3),(1,2,3)]) == Set{Transition}([(1,1,1), (1,1,2), (1,2,2), (1,1,3), (1,2,3)])
+@test_throws BoundsError add_transition!(a, (1,1,4))
+@test rem_transition!(a, (1,1,1)) == Set{Transition}([(1,1,2), (1,2,2), (1,1,3), (1,2,3)])
+@test rem_transitions!(a, Set{Transition}([(1,1,2),(1,2,2)])) == Set{Transition}([(1,1,3), (1,2,3)])
+@test rem_transitions!(a, [(1,1,3)]) == Set{Transition}([(1,2,3)])
