@@ -47,6 +47,7 @@ type Automaton
     end
 end
 Automaton(ns::Int) = Automaton(states = IntSet(1:ns))
+Automaton(ns::Int, ne::Int) = Automaton(states = IntSet(1:ns), events = IntSet(1:ne))
 
 #
 # States
