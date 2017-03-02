@@ -15,13 +15,13 @@ a = Automaton(5)
 @test ns(a) == length(states(a)) == 5
 
 # Test transitions.
-@test_throws BoundsError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(1,1,2)]), IntSet(), IntSet())
-@test_throws BoundsError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(2,1,1)]), IntSet(), IntSet())
-@test_throws BoundsError Automaton(IntSet([1]), IntSet([1]), Set{Transition}([(1,2,1)]), IntSet(), IntSet())
+@test_throws BoundsError Automaton(states=[1],events=[1], transitions=[(1,1,2)])
+@test_throws BoundsError Automaton(states=[1],events=[1], transitions=[(2,1,1)])
+@test_throws BoundsError Automaton(states=[1],events=[1], transitions=[(1,2,1)])
 # Test init states.
-@test_throws BoundsError Automaton(IntSet(), IntSet(), Set{Transition}(), IntSet([1]), IntSet())
+@test_throws BoundsError Automaton(init=[1])
 # Test marked states.
-@test_throws BoundsError Automaton(IntSet(), IntSet(), Set{Transition}(), IntSet(), IntSet([1]))
+@test_throws BoundsError Automaton(marked=[1])
 
 ###
 # Test the different functions
