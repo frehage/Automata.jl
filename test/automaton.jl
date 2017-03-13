@@ -14,11 +14,11 @@ a = Automaton(5)
 @test a.states == states(a) == IntSet(1:5)
 @test ns(a) == length(states(a)) == 5
 
-## Uncontrollable events
-Automaton(states=[1,2], events=[1,2], transitions=[(1,1,2)], uncontrollable=[2]) ==
-Automaton(IntSet([1, 2]),IntSet([1, 2]),Set{Transition}(Tuple{Int64,Int64,Int64}[(1,1,2)]),IntSet([]),IntSet([]),IntSet([1]),IntSet([2]))
+# Uncontrollable events
+a = Automaton(states=[1,2], events=[1,2], transitions=[(1,1,2)], uncontrollable=[2])
+@test a.controllable == controllable(a) == IntSet([1])
+@test a.uncontrollable == uncontrollable(a) == IntSet([2])
 
-##
 # Test transitions.
 @test_throws BoundsError Automaton(states=[1],events=[1], transitions=[(1,1,2)])
 @test_throws BoundsError Automaton(states=[1],events=[1], transitions=[(2,1,1)])

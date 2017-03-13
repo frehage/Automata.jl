@@ -15,18 +15,6 @@ type Automaton
     controllable::IntSet
     uncontrollable::IntSet
 
-    function Automaton(
-            states::IntSet,
-            events::IntSet,
-            transitions::Set{Transition},
-            init::IntSet,
-            marked::IntSet,
-            controllable::IntSet,
-            uncontrollable::IntSet
-        )
-        new(states, events, transitions, init, marked, controllable, uncontrollable)
-    end
-
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
     function Automaton(
             ; states = IntSet(),
@@ -36,9 +24,6 @@ type Automaton
             marked = IntSet(),
             uncontrollable = IntSet()
         )
-
-        events = IntSet(events)
-        uncontrollable = IntSet(uncontrollable)
 
         # Verify transitions
         for (source,event,target) = transitions
@@ -62,11 +47,11 @@ type Automaton
             (e in events) || throw(BoundsError(events, e))
         end
 
-        new(IntSet(states), events, Set{Transition}(transitions), IntSet(init), IntSet(marked), setdiff(events, uncontrollable), uncontrollable)
+        controllable = setdiff(events, uncontrollable)
+        new(IntSet(states), IntSet(events), Set{Transition}(transitions), IntSet(init), IntSet(marked), IntSet(controllable), IntSet(uncontrollable))
     end
 end
 Automaton(ns::Int) = Automaton(states = IntSet(1:ns))
-Automaton(ns::Int, ne::Int) = Automaton(states = IntSet(1:ns), events = IntSet(1:ne))
 Automaton(ns::Int, ne::Int) = Automaton(states = IntSet(1:ns), events = IntSet(1:ne))
 
 ##
@@ -76,6 +61,8 @@ Automaton(ns::Int, ne::Int) = Automaton(states = IntSet(1:ns), events = IntSet(1
 states(a::Automaton) = a.states
 """Return the number of states in an automaton."""
 ns(a::Automaton) = length(states(a))
+init(a::Automaton) = a.init
+marked(a::Automaton) = a.marked
 
 """Add one state to the automaton."""
 add_state!(a::Automaton, state::State) = push!(a.states, state)
@@ -97,7 +84,6 @@ uncontrollable(a::Automaton) = a.uncontrollable
 ne(a::Automaton) = length(events(a))
 
 """Add one event to the automaton."""
-add_event!(a::Automaton, event::Event) = push!(a.events, event)
 function add_event!(a::Automaton, event::Event, uncontrollable::Bool = false)
     if uncontrollable
         setdiff!(a.controllable, event)
@@ -133,21 +119,24 @@ end
 transitions(a::Automaton) = a.transitions
 """Return the number of transitions in an automaton."""
 nt(a::Automaton) = length(transitions(a))
+source(t::Transition) = t[1]
+event(t::Transition) = t[2]
+target(t::Transition) = t[3]
 
 """Add one transition to the automaton."""
-function add_transition!(a::Automaton, transition::Transition)
-    transition[1] in states(a) || throw(BoundsError(states(a), transition[1]))
-    transition[2] in events(a) || throw(BoundsError(events(a), transition[2]))
-    transition[3] in states(a) || throw(BoundsError(states(a), transition[3]))
+function add_transition!(a::Automaton, t::Transition)
+    source(t) in states(a) || throw(BoundsError(states(a), source(transition)))
+    event(t) in events(a) || throw(BoundsError(events(a), event(transition)))
+    target(t) in states(a) || throw(BoundsError(states(a), target(transition)))
     push!(a.transitions, transition)
 end
 """Add set of transitions to the automaton."""
 function add_transitions!(a::Automaton, transitions)
     for transition = transitions
         typeof(transitions) == Transition
-        transition[1] in states(a) || throw(BoundsError(states(a), transition[1]))
-        transition[2] in events(a) || throw(BoundsError(events(a), transition[2]))
-        transition[3] in states(a) || throw(BoundsError(states(a), transition[3]))
+        source(t) in states(a) || throw(BoundsError(states(a), source(transition)))
+        event(t) in events(a) || throw(BoundsError(events(a), event(transition)))
+        target(t) in states(a) || throw(BoundsError(states(a), target(transition)))
     end
     union!(a.transitions, transitions)
 end
@@ -155,3 +144,59 @@ end
 rem_transitions!(a::Automaton, transitions) = setdiff!(a.transitions, transitions)
 """Remove one transition from the automaton."""
 rem_transitions!(a::Automaton, transition::Transition) = rem_transitions!(a, Set{Transition}([transition]))
+
+##
+# The default output format
+#
+import Base.show
+function show(io::IO,a::Automaton)
+    print(io, "Automata.Automaton(
+        states: {", join(a.states, ","), "}
+        events: {", join(a.events, ","), "}
+        transitions: {", join(a.transitions, ","), "}
+        init: {", join(a.init, ","), "}
+        marked: {", join(a.marked, ","), "}
+        controllable: {", join(a.controllable, ","), "}
+        uncontrollable: {", join(a.uncontrollable, ","), "}
+    )")
+end
+
+function plot(a::Automaton)
+
+    # TODO: Fix an assertion to prevent multiple zero degree vertices
+
+    # create a graph representation
+    g = DiGraph(ns(a))
+    vertices = collect(states(a))
+    edgelabel = ["$(event(t) in uncontrollable(a) ? "!" : "")$(event(t))" for t in transitions(a)]
+    for t in transitions(a)
+        add_edge!(g,findfirst(vertices .== source(t)),findfirst(vertices .== target(t)))
+    end
+
+    for v in LightGraphs.vertices(g)
+        @assert length(in_edges(g,v)) + length(out_edges(g,v)) > 0 "No zero degree vertex allowed when plotting: vertex $(v) has no neighbor."
+    end
+
+    # Color the graph, init=blue, marked=green, default=lightblue
+    membership = [s in init(a) ? 1 : (s in marked(a) ? 2 : 3) for s in states(a)]
+    nodecolor = [colorant"blue", colorant"green", colorant"lightblue"]
+    nodefillc = nodecolor[membership]
+
+    # Find a new filename
+    count = 1; while isfile(joinpath(pwd(), "Automaton$(count).pdf")); count += 1; end;
+    file_name = "Automaton$(count).pdf"
+
+    # draw the automaton to a file
+    draw(PDF(file_name, 16cm, 16cm), gplot(
+                g,
+
+                nodefillc=nodefillc,
+                nodelabel=vertices,
+
+                edgelabel=edgelabel,
+                edgelabeldistx=0.5,
+                edgelabeldisty=0.5
+            ))
+
+
+end
