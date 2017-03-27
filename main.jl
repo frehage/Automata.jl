@@ -1,6 +1,6 @@
 ##################
 #
-# This file is used to execute examples and tests on the DirectedControl Package
+# This file is used to execute examples and tests on the Automata Package
 #
 ##################
 include("src/Automata.jl")

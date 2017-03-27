@@ -1,4 +1,3 @@
-
 """A type representing an automaton with time duration on each transition."""
 type TimedAutomaton
 
@@ -40,3 +39,22 @@ transitions(a::TimedAutomaton) = a.transitions
 nt(a::TimedAutomaton) = length(transitions(a))
 """Return the duration of a specifc transition."""
 duration(a::TimedAutomaton, t::Transition) = a.transitions[t]
+
+
+##
+# The default output format
+#
+import Base.show
+function show(io::IO,ta::TimedAutomaton)
+    print(io, "Automata.TimedAutomaton(
+        states: {", join(ta.automaton.states, ","), "}
+        events: {", join(ta.automaton.events, ","), "}
+        transitions: {", join(["$k => $v" for (k,v) in ta.transitions],","), "}
+        init: {", join(ta.automaton.init, ","), "}
+        marked: {", join(ta.automaton.marked, ","), "}
+        controllable: {", join(ta.automaton.controllable, ","), "}
+        uncontrollable: {", join(ta.automaton.uncontrollable, ","), "}
+    )")
+end
+
+plot(ta::TimedAutomaton) = plot(ta.automaton)

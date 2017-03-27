@@ -164,6 +164,9 @@ end
 
 function plot(a::Automaton)
 
+    error("Ploting is not yet working...")
+    # TODO: The edgelabels don't map correctly to the edges (the sorting is different).
+    # TODO: Potential problem when there are multiple transitions from state a to state b.
     # TODO: Fix an assertion to prevent multiple zero degree vertices
 
     # create a graph representation
