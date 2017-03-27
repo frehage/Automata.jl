@@ -16,10 +16,14 @@ export
     transitions, nt, add_transition!, add_transitions!, rem_transition!, rem_transitions!,  # funcitons for transitions
     source,event,target, # elements in a transition
     init, marked, # lists init/marked states
-    plot
+    plot,
+
+    # TimedAutomaton
+    TimedAutomaton, # type defs
+    duration
 
 # source files
 include("automaton.jl")
-#include("automata.jl")
+include("timed_automaton.jl")
 
 end

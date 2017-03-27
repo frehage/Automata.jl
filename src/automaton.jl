@@ -125,18 +125,19 @@ target(t::Transition) = t[3]
 
 """Add one transition to the automaton."""
 function add_transition!(a::Automaton, t::Transition)
-    source(t) in states(a) || throw(BoundsError(states(a), source(transition)))
-    event(t) in events(a) || throw(BoundsError(events(a), event(transition)))
-    target(t) in states(a) || throw(BoundsError(states(a), target(transition)))
-    push!(a.transitions, transition)
+    source(t) in states(a) || throw(BoundsError(states(a), source(t)))
+    event(t) in events(a) || throw(BoundsError(events(a), event(t)))
+    target(t) in states(a) || throw(BoundsError(states(a), target(t)))
+    push!(a.transitions, t)
 end
+
 """Add set of transitions to the automaton."""
 function add_transitions!(a::Automaton, transitions)
-    for transition = transitions
-        typeof(transitions) == Transition
-        source(t) in states(a) || throw(BoundsError(states(a), source(transition)))
-        event(t) in events(a) || throw(BoundsError(events(a), event(transition)))
-        target(t) in states(a) || throw(BoundsError(states(a), target(transition)))
+    for t = transitions
+        typeof(t) == Transition || throw(ArgumentError("transitions requires a collection of ::Transition, error on: ($(source(t)),$(event(t)),$(target(t)))"))
+        source(t) in states(a) || throw(BoundsError(states(a), source(t)))
+        event(t) in events(a) || throw(BoundsError(events(a), event(t)))
+        target(t) in states(a) || throw(BoundsError(states(a), target(t)))
     end
     union!(a.transitions, transitions)
 end

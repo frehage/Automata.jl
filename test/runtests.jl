@@ -3,6 +3,7 @@ using Base.Test
 
 tests = [
     "automaton"
+    "timed_automaton"
 ]
 
 testdir = dirname(@__FILE__)
