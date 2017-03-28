@@ -20,7 +20,7 @@ export
 
     # TimedAutomaton
     TimedAutomaton, # type defs
-    duration
+    durations, duration
 
 # source files
 include("automaton.jl")

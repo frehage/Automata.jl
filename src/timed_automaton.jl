@@ -5,40 +5,58 @@ type TimedAutomaton
     automaton::Automaton
 
     """TimedAutomaton.transitions::Dict{Transition, Int64} - A dictionary representing the duration of each transition"""
-    transitions::Dict{Transition, Int64}
+    durations::Dict{Transition, Int64}
 
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
     function TimedAutomaton(
             automaton = Automaton(),
-            transitions = Dict{Transition, Int64}()
+            durations = Dict{Transition, Int64}()
         )
 
         # Verify uncontrollable events
-        (length(transitions) == nt(automaton)) || throw(ArgumentError("Nubmer of duration specified must equal number of transitions."))
+        (length(durations) == nt(automaton)) || throw(ArgumentError("Nubmer of durations specified must equal number of transitions in the underlying automaton."))
 
-        new(automaton, transitions)
+        new(automaton, durations)
     end
 end
-function TimedAutomaton(transitions::Dict{Transition, Int64})
+function TimedAutomaton(durations::Dict{Transition, Int64})
     a = Automaton()
-    for (transition,duration) in transitions
+    for (transition,duration) in durations
         add_state!(a, source(transition))
         add_event!(a, event(transition))
         add_state!(a, target(transition))
         add_transition!(a, transition)
     end
-    return TimedAutomaton(a, transitions)
+    return TimedAutomaton(a, durations)
 end
 
 ##
-# Transitions
+# Automaton functions
 #
+"""Return the states of an automaton."""
+states(ta::TimedAutomaton) = states(ta.automaton)
+"""Return the number of states in an automaton."""
+ns(ta::TimedAutomaton) = ns(ta.automaton)
+init(ta::TimedAutomaton) = init(ta.automaton)
+marked(ta::TimedAutomaton) = marked(ta.automaton)
+"""Return the events of an automaton."""
+events(ta::TimedAutomaton) = events(ta.automaton)
+controllable(ta::TimedAutomaton) = controllable(ta.automaton)
+uncontrollable(ta::TimedAutomaton) = uncontrollable(ta.automaton)
+"""Return the number of events in an automaton."""
+ne(ta::TimedAutomaton) = ne(ta.automaton)
 """Return the transitions of an automaton."""
-transitions(a::TimedAutomaton) = a.transitions
+transitions(ta::TimedAutomaton) = transitions(ta.automaton)
 """Return the number of transitions in an automaton."""
-nt(a::TimedAutomaton) = length(transitions(a))
+nt(ta::TimedAutomaton) = nt(ta.automaton)
+
+##
+# Durations
+#
+"""Return ::Dict{Transition,Int64} with durations of all transitions."""
+durations(ta::TimedAutomaton) = ta.durations
 """Return the duration of a specifc transition."""
-duration(a::TimedAutomaton, t::Transition) = a.transitions[t]
+duration(ta::TimedAutomaton, t::Transition) = ta.durations[t]
 
 
 ##
@@ -49,7 +67,7 @@ function show(io::IO,ta::TimedAutomaton)
     print(io, "Automata.TimedAutomaton(
         states: {", join(ta.automaton.states, ","), "}
         events: {", join(ta.automaton.events, ","), "}
-        transitions: {", join(["$k => $v" for (k,v) in ta.transitions],","), "}
+        transitions: {", join(["$k => $v" for (k,v) in ta.durations],","), "}
         init: {", join(ta.automaton.init, ","), "}
         marked: {", join(ta.automaton.marked, ","), "}
         controllable: {", join(ta.automaton.controllable, ","), "}

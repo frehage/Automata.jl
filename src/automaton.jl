@@ -28,7 +28,7 @@ type Automaton
         # Verify transitions
         for (source,event,target) = transitions
             source in states || throw(BoundsError(states, source))
-            event in events || throw(BoundsError(states, event))
+            event in events || throw(BoundsError(events, event))
             target in states || throw(BoundsError(states, target))
         end
 
@@ -53,6 +53,8 @@ type Automaton
 end
 Automaton(ns::Int) = Automaton(states = IntSet(1:ns))
 Automaton(ns::Int, ne::Int) = Automaton(states = IntSet(1:ns), events = IntSet(1:ne))
+Automaton(ns::Int, ne::Int; transitions = Set{Transition}(), init = IntSet(), marked = IntSet(), uncontrollable = IntSet()) =
+    Automaton(states = IntSet(1:ns), events = IntSet(1:ne), transitions = transitions, init = init, marked = marked, uncontrollable = uncontrollable)
 
 ##
 # States
