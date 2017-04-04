@@ -67,11 +67,26 @@ init(a::Automaton) = a.init
 marked(a::Automaton) = a.marked
 
 """Add one state to the automaton."""
-add_state!(a::Automaton, state::State) = push!(a.states, state)
+function add_state!(a::Automaton, state::State, init::Bool = false, marked::Bool = false)
+    push!(a.states, state)
+    !init || push!(a.init, state)
+    !marked || push!(a.marked, state)
+    a.states
+end
 """Add set of states to the automaton."""
-add_states!(a::Automaton, states) = union!(a.states, states)
+function add_states!(a::Automaton, states, init = IntSet(), marked = IntSet())
+    union!(a.states, states)
+    union!(a.init, init)
+    union!(a.marked, marked)
+    a.states
+end
 """Remove one or multiple states from the automaton."""
-rem_states!(a::Automaton, states) = setdiff!(a.states, states)
+function rem_states!(a::Automaton, states)
+    setdiff!(a.states, states)
+    setdiff!(a.init, states)
+    setdiff!(a.marked, states)
+    a.states
+end
 
 
 
