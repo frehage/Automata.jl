@@ -1,1 +1,3 @@
-*.pdf
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
