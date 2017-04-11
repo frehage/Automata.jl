@@ -52,7 +52,6 @@ type Automaton
     end
 end
 Automaton(ns::Int) = Automaton(states = IntSet(1:ns))
-Automaton(ns::Int, ne::Int) = Automaton(states = IntSet(1:ns), events = IntSet(1:ne))
 Automaton(ns::Int, ne::Int; transitions = Set{Transition}(), init = IntSet(), marked = IntSet(), uncontrollable = IntSet()) =
     Automaton(states = IntSet(1:ns), events = IntSet(1:ne), transitions = transitions, init = init, marked = marked, uncontrollable = uncontrollable)
 
@@ -166,7 +165,15 @@ rem_transitions!(a::Automaton, transition::Transition) = rem_transitions!(a, Set
 ##
 # The default output format
 #
-import Base.show
+function ==(a::Automaton, b::Automaton)
+  na=fieldnames(a)
+  for n in 1:length(na)
+     if getfield(a,na[n])!=getfield(b,na[n])
+        return false
+     end
+  end
+  return true
+end
 function show(io::IO,a::Automaton)
     print(io, "Automata.Automaton(
         states: {", join(a.states, ","), "}
@@ -179,7 +186,7 @@ function show(io::IO,a::Automaton)
     )")
 end
 
-function plot(a::Automaton)
+#=function plot(a::Automaton)
 
     error("Ploting is not yet working...")
     # TODO: The edgelabels don't map correctly to the edges (the sorting is different).
@@ -220,4 +227,4 @@ function plot(a::Automaton)
             ))
 
 
-end
+end=#

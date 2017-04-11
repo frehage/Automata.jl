@@ -19,7 +19,7 @@ type TimedAutomaton
         new(automaton, durations)
     end
 end
-function TimedAutomaton(durations::Dict{Transition, Int64})
+function TimedAutomaton(durations::Dict{Transition, Int64}; init=IntSet(), marked=IntSet(), uncontrollable=IntSet())
     a = Automaton()
     for (transition,duration) in durations
         add_state!(a, source(transition))
@@ -27,6 +27,10 @@ function TimedAutomaton(durations::Dict{Transition, Int64})
         add_state!(a, target(transition))
         add_transition!(a, transition)
     end
+    a.init = IntSet(init)
+    a.marked = IntSet(marked)
+    a.controllable = IntSet(setdiff(states(a), uncontrollable))
+    a.uncontrollable = IntSet(uncontrollable)
     return TimedAutomaton(a, durations)
 end
 
@@ -60,9 +64,18 @@ duration(ta::TimedAutomaton, t::Transition) = ta.durations[t]
 
 
 ##
-# The default output format
+# Utility functions for comparison and output
 #
-import Base.show
+function ==(a::TimedAutomaton, b::TimedAutomaton)
+  na=fieldnames(a)
+  for n in 1:length(na)
+     if getfield(a,na[n])!=getfield(b,na[n])
+        return false
+     end
+  end
+  return true
+end
+
 function show(io::IO,ta::TimedAutomaton)
     print(io, "Automata.TimedAutomaton(
         states: {", join(ta.automaton.states, ","), "}
@@ -75,4 +88,4 @@ function show(io::IO,ta::TimedAutomaton)
     )")
 end
 
-plot(ta::TimedAutomaton) = plot(ta.automaton)
+# plot(ta::TimedAutomaton) = plot(ta.automaton)

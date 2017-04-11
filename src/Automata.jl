@@ -8,6 +8,8 @@ using GraphPlot         # For graph visualization
 using Colors            # For coloring of the nodes
 using Compose           # For drawing to file
 
+import Base: ==, show
+
 export
     # Automaton
     Automaton, State, Event, Transition, # type defs
@@ -16,7 +18,7 @@ export
     transitions, nt, add_transition!, add_transitions!, rem_transition!, rem_transitions!,  # funcitons for transitions
     source,event,target, # elements in a transition
     init, marked, # lists init/marked states
-    plot,
+    #plot,
 
     # TimedAutomaton
     TimedAutomaton, # type defs

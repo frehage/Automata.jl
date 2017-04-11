@@ -8,11 +8,14 @@
 
 # Test the parameter values of newly created objects
 a = Automaton()
-@test a.states == states(a) == IntSet()
+@test a.states == states(a) == events(a) == init(a) == marked(a) == IntSet()
 @test ns(a) == length(states(a)) == 0
 a = Automaton(5)
-@test a.states == states(a) == IntSet(1:5)
-@test ns(a) == length(states(a)) == 5
+@test states(a) == IntSet(1:5)
+@test ns(a) == 5
+a = Automaton(5,5)
+@test states(a) == events(a) == IntSet(1:5)
+@test ns(a) == ne(a) == 5
 
 # Uncontrollable events
 a = Automaton(states=[1,2], events=[1,2], transitions=[(1,1,2)], uncontrollable=[2])
@@ -70,3 +73,22 @@ add_events!(a,[1,2])
 @test rem_transitions!(a, (1,1,1)) == Set{Transition}([(1,1,2), (1,2,2), (1,1,3), (1,2,3)])
 @test rem_transitions!(a, Set{Transition}([(1,1,2),(1,2,2)])) == Set{Transition}([(1,1,3), (1,2,3)])
 @test rem_transitions!(a, [(1,1,3)]) == Set{Transition}([(1,2,3)])
+
+# Test the show function
+a = Automaton(states=1:2, events=1:2, transitions=[(1,1,2),(2,2,1)], init=[1], marked=[2], uncontrollable=[2])
+originalSTDOUT = STDOUT
+(outRead, outWrite) = redirect_stdout()
+show(a)
+close(outWrite)
+data = String(readavailable(outRead))
+close(outRead)
+redirect_stdout(originalSTDOUT)
+@test data == "Automata.Automaton(
+        states: {1,2}
+        events: {1,2}
+        transitions: {(2,2,1),(1,1,2)}
+        init: {1}
+        marked: {2}
+        controllable: {1}
+        uncontrollable: {2}
+    )"
