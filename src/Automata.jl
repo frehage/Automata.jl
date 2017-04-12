@@ -8,6 +8,9 @@ using GraphPlot         # For graph visualization
 using Colors            # For coloring of the nodes
 using Compose           # For drawing to file
 
+# used by the synch
+using DataStructures    # For Queue
+
 import Base: ==, show
 
 export
@@ -22,10 +25,14 @@ export
 
     # TimedAutomaton
     TimedAutomaton, # type defs
-    durations, duration
+    durations, duration,
+
+    # Syncronization
+    sync
 
 # source files
 include("automaton.jl")
 include("timed_automaton.jl")
+include("synchronization.jl")
 
 end

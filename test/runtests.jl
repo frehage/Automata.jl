@@ -4,6 +4,7 @@ using Base.Test
 tests = [
     "automaton"
     "timed_automaton"
+    "synchronization"
 ]
 
 testdir = dirname(@__FILE__)
