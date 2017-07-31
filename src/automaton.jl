@@ -1,7 +1,7 @@
 """Typealias for the componbents of the automaton."""
 const State = Int
 const Event = Int
-const Transition = Tuple{State,Event,State}
+const Transition = Tuple{State,Event,State} 
 
 """A type representing an automaton."""
 type Automaton
