@@ -3,10 +3,10 @@
 module Automata
 
 # Dependencies of the graph visualization in plot(::Automaton)
-using LightGraphs       # For Graph representation
-using GraphPlot         # For graph visualization
-using Colors            # For coloring of the nodes
-using Compose           # For drawing to file
+#using LightGraphs       # For Graph representation
+#using GraphPlot         # For graph visualization
+#using Colors            # For coloring of the nodes
+#using Compose           # For drawing to file
 
 # used by the synch
 using DataStructures    # For Queue
