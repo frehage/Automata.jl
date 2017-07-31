@@ -86,7 +86,7 @@ redirect_stdout(originalSTDOUT)
 @test data == "Automata.Automaton(
         states: {1,2}
         events: {1,2}
-        transitions: {(2,2,1),(1,1,2)}
+        transitions: {(2, 2, 1),(1, 1, 2)}
         init: {1}
         marked: {2}
         controllable: {1}

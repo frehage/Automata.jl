@@ -4,34 +4,20 @@ type TimedAutomaton
     """TimedAutomaton.automaton::Automaton - The element representing the basic automaton"""
     automaton::Automaton
 
-    """TimedAutomaton.transitions::Dict{Transition, Int64} - A dictionary representing the duration of each transition"""
-    durations::Dict{Transition, Int64}
+    """TimedAutomaton.transitions::Dict{Event, Int64} - A dictionary representing the duration of each event"""
+    durations::Dict{Event, Int64}
 
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
     function TimedAutomaton(
             automaton = Automaton(),
-            durations = Dict{Transition, Int64}()
+            durations = Dict{Event, Int64}()
         )
 
         # Verify uncontrollable events
-        (length(durations) == nt(automaton)) || throw(ArgumentError("Nubmer of durations specified must equal number of transitions in the underlying automaton."))
+        (length(durations) == ne(automaton)) || throw(ArgumentError("Nubmer of durations specified must equal number of events in the underlying automaton."))
 
         new(automaton, durations)
     end
-end
-function TimedAutomaton(durations::Dict{Transition, Int64}; init=IntSet(), marked=IntSet(), uncontrollable=IntSet())
-    a = Automaton()
-    for (transition,duration) in durations
-        add_state!(a, source(transition))
-        add_event!(a, event(transition))
-        add_state!(a, target(transition))
-        add_transition!(a, transition)
-    end
-    a.init = IntSet(init)
-    a.marked = IntSet(marked)
-    a.controllable = IntSet(setdiff(states(a), uncontrollable))
-    a.uncontrollable = IntSet(uncontrollable)
-    return TimedAutomaton(a, durations)
 end
 
 ##
@@ -57,10 +43,10 @@ nt(ta::TimedAutomaton) = nt(ta.automaton)
 ##
 # Durations
 #
-"""Return ::Dict{Transition,Int64} with durations of all transitions."""
+"""Return ::Dict{Event,Int64} with durations of all events."""
 durations(ta::TimedAutomaton) = ta.durations
-"""Return the duration of a specifc transition."""
-duration(ta::TimedAutomaton, t::Transition) = ta.durations[t]
+"""Return the duration of a specifc event."""
+duration(ta::TimedAutomaton, e::Event) = ta.durations[e]
 
 
 ##
@@ -79,8 +65,8 @@ end
 function show(io::IO,ta::TimedAutomaton)
     print(io, "Automata.TimedAutomaton(
         states: {", join(ta.automaton.states, ","), "}
-        events: {", join(ta.automaton.events, ","), "}
-        transitions: {", join(["$k => $v" for (k,v) in ta.durations],","), "}
+        events: {", join(["$k => $(ta.durations[k])" for k in sort(collect(keys(ta.durations)))], ","), "}
+        transitions: {", join(ta.automaton.transitions,","), "}
         init: {", join(ta.automaton.init, ","), "}
         marked: {", join(ta.automaton.marked, ","), "}
         controllable: {", join(ta.automaton.controllable, ","), "}
