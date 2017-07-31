@@ -66,7 +66,7 @@ function show(io::IO,ta::TimedAutomaton)
     print(io, "Automata.TimedAutomaton(
         states: {", join(ta.automaton.states, ","), "}
         events: {", join(["$k => $(ta.durations[k])" for k in sort(collect(keys(ta.durations)))], ","), "}
-        transitions: {", join(ta.automaton.transitions,","), "}
+        transitions: {", join(["($s,$e,$t)" for (s,e,t) in ta.automaton.transitions],","), "}
         init: {", join(ta.automaton.init, ","), "}
         marked: {", join(ta.automaton.marked, ","), "}
         controllable: {", join(ta.automaton.controllable, ","), "}

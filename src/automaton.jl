@@ -1,7 +1,7 @@
 """Typealias for the componbents of the automaton."""
 const State = Int
 const Event = Int
-const Transition = Tuple{State,Event,State} 
+const Transition = Tuple{State,Event,State}
 
 """A type representing an automaton."""
 type Automaton
@@ -178,7 +178,7 @@ function show(io::IO,a::Automaton)
     print(io, "Automata.Automaton(
         states: {", join(a.states, ","), "}
         events: {", join(a.events, ","), "}
-        transitions: {", join(a.transitions, ","), "}
+        transitions: {", join(["($s,$e,$t)" for (s,e,t) in a.transitions], ","), "}
         init: {", join(a.init, ","), "}
         marked: {", join(a.marked, ","), "}
         controllable: {", join(a.controllable, ","), "}
