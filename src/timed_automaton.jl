@@ -5,16 +5,16 @@ type TimedAutomaton
     automaton::Automaton
 
     """TimedAutomaton.transitions::Dict{Event, Int64} - A dictionary representing the duration of each event"""
-    durations::Dict{Event, Int64}
+    durations::Array{Int64,1}
 
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
     function TimedAutomaton(
             automaton = Automaton(),
-            durations = Dict{Event, Int64}()
+            durations = Array{Int64,1}()
         )
 
-        # Verify uncontrollable events
-        (length(durations) == ne(automaton)) || throw(ArgumentError("Nubmer of durations specified must equal number of events in the underlying automaton."))
+        # Verify number of durations
+        (length(durations) == maximum(events(automaton))) || throw(ArgumentError("Nubmer of durations specified must equal number of events in the underlying automaton."))
 
         new(automaton, durations)
     end
@@ -65,7 +65,7 @@ end
 function show(io::IO,ta::TimedAutomaton)
     print(io, "Automata.TimedAutomaton(
         states: {", join(ta.automaton.states, ","), "}
-        events: {", join(["$k => $(ta.durations[k])" for k in sort(collect(keys(ta.durations)))], ","), "}
+        events: {", join(["$k => $(ta.durations[k])" for k in events(ta.automaton)], ","), "}
         transitions: {", join(["($s,$e,$t)" for (s,e,t) in ta.automaton.transitions],","), "}
         init: {", join(ta.automaton.init, ","), "}
         marked: {", join(ta.automaton.marked, ","), "}
