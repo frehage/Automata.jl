@@ -14,7 +14,11 @@ type TimedAutomaton
         )
 
         # Verify number of durations
-        (length(durations) == maximum(events(automaton))) || throw(ArgumentError("Nubmer of durations specified must equal number of events in the underlying automaton."))
+        if ne(automaton) == 0
+            length(durations) == 0 || throw(ArgumentError("Nubmer of durations specified must equal number of events in the underlying automaton."))
+        else
+            (length(durations) == maximum(events(automaton))) || throw(ArgumentError("Nubmer of durations specified must equal number of events in the underlying automaton."))
+        end
 
         new(automaton, durations)
     end
