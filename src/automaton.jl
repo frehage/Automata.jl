@@ -26,25 +26,25 @@ type Automaton
         )
 
         # Verify transitions
-        for (source,event,target) = transitions
-            source in states || throw(BoundsError(states, source))
-            event in events || throw(BoundsError(events, event))
-            target in states || throw(BoundsError(states, target))
+        for (source,event,target) in transitions
+            source in states || push!(states, source)
+            event in events || push!(events, event)
+            target in states || push!(states, target)
         end
 
         # Verify init states
-        for q = init
-            (q in states) || throw(BoundsError(states, q))
+        for q in init
+            (q in states) || push!(states, q)
         end
 
         # Verify marked states
-        for q = marked
-            (q in states) || throw(BoundsError(states, q))
+        for q in marked
+            (q in states) || push!(states, q)
         end
 
         # Verify uncontrollable events
-        for e = uncontrollable
-            (e in events) || throw(BoundsError(events, e))
+        for e in uncontrollable
+            (e in events) || push!(events, e)
         end
 
         controllable = setdiff(events, uncontrollable)
@@ -149,7 +149,7 @@ end
 
 """Add set of transitions to the automaton."""
 function add_transitions!(a::Automaton, transitions)
-    for t = transitions
+    for t in transitions
         typeof(t) == Transition || throw(ArgumentError("transitions requires a collection of ::Transition, error on: ($(source(t)),$(event(t)),$(target(t)))"))
         source(t) in states(a) || throw(BoundsError(states(a), source(t)))
         event(t) in events(a) || throw(BoundsError(events(a), event(t)))

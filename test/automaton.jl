@@ -23,13 +23,11 @@ a = Automaton(states=[1,2], events=[1,2], transitions=[(1,1,2)], uncontrollable=
 @test a.uncontrollable == uncontrollable(a) == IntSet([2])
 
 # Test transitions.
-@test_throws BoundsError Automaton(states=[1],events=[1], transitions=[(1,1,2)])
-@test_throws BoundsError Automaton(states=[1],events=[1], transitions=[(2,1,1)])
-@test_throws BoundsError Automaton(states=[1],events=[1], transitions=[(1,2,1)])
+@test Automaton(states=[1],events=[1], transitions=[(1,1,2)]) == Automaton(states=[1,2],events=[1], transitions=[(1,1,2)])
 # Test init states.
-@test_throws BoundsError Automaton(init=[1])
+@test Automaton(init=[1]) == Automaton(states=[1], init=[1])
 # Test marked states.
-@test_throws BoundsError Automaton(marked=[1])
+@test Automaton(marked=[1]) == Automaton(states=[1], marked=[1])
 
 ###
 # Test the different functions
