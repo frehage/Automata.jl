@@ -4,13 +4,13 @@ type TimedAutomaton
     """TimedAutomaton.automaton::Automaton - The element representing the basic automaton"""
     automaton::Automaton
 
-    """TimedAutomaton.transitions::Dict{Event, Int64} - A dictionary representing the duration of each transition"""
-    durations::Dict{Transition,Int64}
+    """TimedAutomaton.transitions::Dict{Event, Float64} - A dictionary representing the duration of each transition"""
+    durations::Dict{Transition,Float64}
 
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
     function TimedAutomaton(
             automaton = Automaton(),
-            durations = Dict{Transition,Int64}()
+            durations = Dict{Transition,Float64}()
         )
 
         # Verify number of durations
@@ -47,7 +47,7 @@ nt(ta::TimedAutomaton) = nt(ta.automaton)
 ##
 # Durations
 #
-"""Return ::Dict{Event,Int64} with durations of all events."""
+"""Return ::Dict{Event,Float64} with durations of all events."""
 durations(ta::TimedAutomaton) = ta.durations
 """Return the duration of a specifc event."""
 duration(ta::TimedAutomaton, t::Transition) = ta.durations[t]
