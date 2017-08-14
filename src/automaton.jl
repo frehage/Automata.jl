@@ -27,24 +27,24 @@ type Automaton
 
         # Verify transitions
         for (source,event,target) in transitions
-            source in states || push!(states, source)
-            event in events || push!(events, event)
-            target in states || push!(states, target)
+            source in states || push!(collect(states), source)
+            event in events || push!(collect(events), event)
+            target in states || push!(collect(states), target)
         end
 
         # Verify init states
         for q in init
-            (q in states) || push!(states, q)
+            (q in states) || push!(collect(states), q)
         end
 
         # Verify marked states
         for q in marked
-            (q in states) || push!(states, q)
+            (q in states) || push!(collect(states), q)
         end
 
         # Verify uncontrollable events
         for e in uncontrollable
-            (e in events) || push!(events, e)
+            (e in events) || push!(collect(events), e)
         end
 
         controllable = setdiff(events, uncontrollable)
