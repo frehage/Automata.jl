@@ -4,20 +4,20 @@ type TimedAutomaton
     """TimedAutomaton.automaton::Automaton - The element representing the basic automaton"""
     automaton::Automaton
 
-    """TimedAutomaton.transitions::Dict{Event, Int64} - A dictionary representing the duration of each event"""
-    durations::Array{Int64,1}
+    """TimedAutomaton.transitions::Dict{Event, Int64} - A dictionary representing the duration of each transition"""
+    durations::Dict{Transition,Int64}
 
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
     function TimedAutomaton(
             automaton = Automaton(),
-            durations = Array{Int64,1}()
+            durations = Dict{Transition,Int64}()
         )
 
         # Verify number of durations
         if ne(automaton) == 0
             length(durations) == 0 || throw(ArgumentError("Nubmer of durations specified must equal number of events in the underlying automaton."))
         else
-            (length(durations) == maximum(events(automaton))) || throw(ArgumentError("Nubmer of durations specified must equal number of events in the underlying automaton."))
+            (length(durations) == length(automaton.transitions)) || throw(ArgumentError("Nubmer of durations specified must equal number of transitions in the underlying automaton."))
         end
 
         new(automaton, durations)
@@ -50,7 +50,7 @@ nt(ta::TimedAutomaton) = nt(ta.automaton)
 """Return ::Dict{Event,Int64} with durations of all events."""
 durations(ta::TimedAutomaton) = ta.durations
 """Return the duration of a specifc event."""
-duration(ta::TimedAutomaton, e::Event) = ta.durations[e]
+duration(ta::TimedAutomaton, t::Transition) = ta.durations[t]
 
 
 ##
@@ -69,8 +69,8 @@ end
 function show(io::IO,ta::TimedAutomaton)
     print(io, "Automata.TimedAutomaton(
         states: {", join(ta.automaton.states, ","), "}
-        events: {", join(["$k => $(ta.durations[k])" for k in events(ta.automaton)], ","), "}
-        transitions: {", join(["($s,$e,$t)" for (s,e,t) in ta.automaton.transitions],","), "}
+        events: {", join(ta.automaton.events, ","), "}
+        transitions: {", join(["($s,$e,$t) => $(ta.durations[(s,e,t)])" for (s,e,t) in ta.automaton.transitions],","), "}
         init: {", join(ta.automaton.init, ","), "}
         marked: {", join(ta.automaton.marked, ","), "}
         controllable: {", join(ta.automaton.controllable, ","), "}
@@ -79,3 +79,4 @@ function show(io::IO,ta::TimedAutomaton)
 end
 
 # plot(ta::TimedAutomaton) = plot(ta.automaton)
+|
