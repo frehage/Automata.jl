@@ -24,38 +24,31 @@ type Automaton
             marked = IntSet(),
             uncontrollable = IntSet()
         )
-        states = IntSet(collect(states)),
-        events = IntSet(collect(events)),
-        transitions = Set{Transition}(transitions),
-        init = IntSet(collect(init)),
-        marked = IntSet(collect(marked)),
-        uncontrollable = IntSet(collect(uncontrollable))
-
 
         # Verify transitions
         for (source,event,target) in transitions
-            source in states || push!(states, source)
-            event in events || push!(events, event)
-            target in states || push!(states, target)
+            source in states || (states = union(states, source))
+            event in events || (events = union(events, event))
+            target in states || (states = union(states, target))
         end
 
         # Verify init states
         for q in init
-            (q in states) || push!(states, q)
+            (q in states) || (states = union(states, q))
         end
 
         # Verify marked states
         for q in marked
-            (q in states) || push!(states, q)
+            (q in states) || (states = union(states, q))
         end
 
         # Verify uncontrollable events
         for e in uncontrollable
-            (e in events) || push!(events, e)
+            (e in events) || (events = union(events, e))
         end
 
         controllable = setdiff(events, uncontrollable)
-        new(states, events, transitions, init, marked, controllable, uncontrollable)
+        new(IntSet(states), IntSet(events), Set{Transition}(transitions), IntSet(init), IntSet(marked), IntSet(controllable), IntSet(uncontrollable))
     end
 end
 Automaton(ns::Int) = Automaton(states = IntSet(1:ns))

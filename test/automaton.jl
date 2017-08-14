@@ -24,6 +24,8 @@ a = Automaton(states=[1,2], events=[1,2], transitions=[(1,1,2)], uncontrollable=
 
 # Test transitions.
 @test Automaton(states=[1],events=[1], transitions=[(1,1,2)]) == Automaton(states=[1,2],events=[1], transitions=[(1,1,2)])
+@test Automaton(states=[1],events=[1], transitions=[(1,2,2)]) == Automaton(states=[1,2],events=[1,2], transitions=[(1,2,2)])
+@test Automaton(states=1:1,events=1:1, transitions=[(1,2,2)]) == Automaton(states=[1,2],events=[1,2], transitions=[(1,2,2)])
 # Test init states.
 @test Automaton(init=[1]) == Automaton(states=[1], init=[1])
 # Test marked states.
