@@ -43,7 +43,7 @@ redirect_stdout(originalSTDOUT)
 @test data == "Automata.TimedAutomaton(
         states: {1,2}
         events: {1,5}
-        transitions: {(2,5,1) => 3,(1,1,2) => 1}
+        transitions: {(2,5,1) => 3.0,(1,1,2) => 1.0}
         init: {1}
         marked: {2}
         controllable: {1}

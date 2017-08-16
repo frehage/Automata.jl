@@ -5,12 +5,12 @@ type TimedAutomaton
     automaton::Automaton
 
     """TimedAutomaton.transitions::Dict{Event, Float64} - A dictionary representing the duration of each transition"""
-    durations::Dict{Transition,Number}
+    durations::Dict{Transition,Float64}
 
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
-    function TimedAutomaton{T<:Number}(
+    function TimedAutomaton(
             automaton::Automaton = Automaton(),
-            durations::Dict{Transition,T} = Dict{Transition,Float64}()
+            durations = Dict{Transition,Float64}()
         )
 
         # Verify number of durations
