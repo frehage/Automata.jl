@@ -6,6 +6,8 @@
 # Test the constructors and the generated objects
 ###
 
+
+
 # Test the parameter values of newly created objects
 a = Automaton(states=1:2,events=[1,5],transitions=[(1,1,2),(2,5,1)], init=[1], marked=[2], uncontrollable=[5])
 ta = TimedAutomaton(a,Dict((1,1,2)=>1,(2,5,1)=>3))
@@ -18,7 +20,16 @@ ta = TimedAutomaton(a,Dict((1,1,2)=>1,(2,5,1)=>3))
 @test init(ta) == IntSet([1])
 @test marked(ta) == IntSet([2]) && uncontrollable(ta) == IntSet([5])
 
-
+# test the extra constructor
+a = Automaton(
+        states = 1:2,
+        events = [1,5],
+        transitions = [(1,1,2),(2,5,1)],
+        )
+d = Dict((1,1,2)=>1,(2,5,1)=>3)
+ta2 = TimedAutomaton(durations=d)
+@test ta2.automaton == a
+@test ta2.durations == d
 
 
 # Test the show function
@@ -32,7 +43,7 @@ redirect_stdout(originalSTDOUT)
 @test data == "Automata.TimedAutomaton(
         states: {1,2}
         events: {1,5}
-        transitions: {(2,5,1) => 3.0,(1,1,2) => 1.0}
+        transitions: {(2,5,1) => 3,(1,1,2) => 1}
         init: {1}
         marked: {2}
         controllable: {1}
