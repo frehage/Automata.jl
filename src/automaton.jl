@@ -141,9 +141,9 @@ target(t::Transition) = t[3]
 
 """Add one transition to the automaton."""
 function add_transition!(a::Automaton, t::Transition)
-    source(t) in states(a) || throw(BoundsError(states(a), source(t)))
-    event(t) in events(a) || throw(BoundsError(events(a), event(t)))
-    target(t) in states(a) || throw(BoundsError(states(a), target(t)))
+    source(t) in states(a) || push!(a.states, source(t))
+    event(t) in events(a) ||  push!(a.events, event(t))
+    target(t) in states(a) || push!(a.states, target(t))
     push!(a.transitions, t)
 end
 
@@ -151,16 +151,14 @@ end
 function add_transitions!(a::Automaton, transitions)
     for t in transitions
         typeof(t) == Transition || throw(ArgumentError("transitions requires a collection of ::Transition, error on: ($(source(t)),$(event(t)),$(target(t)))"))
-        source(t) in states(a) || throw(BoundsError(states(a), source(t)))
-        event(t) in events(a) || throw(BoundsError(events(a), event(t)))
-        target(t) in states(a) || throw(BoundsError(states(a), target(t)))
+        add_transition!(a, t)
     end
     union!(a.transitions, transitions)
 end
 """Remove a set of transitions from the automaton."""
 rem_transitions!(a::Automaton, transitions) = setdiff!(a.transitions, transitions)
 """Remove one transition from the automaton."""
-rem_transitions!(a::Automaton, transition::Transition) = rem_transitions!(a, Set{Transition}([transition]))
+rem_transition!(a::Automaton, transition::Transition) = rem_transitions!(a, Set{Transition}([transition]))
 
 ##
 # The default output format
