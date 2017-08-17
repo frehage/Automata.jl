@@ -141,19 +141,18 @@ target(t::Transition) = t[3]
 
 """Add one transition to the automaton."""
 function add_transition!(a::Automaton, t::Transition)
-    source(t) in states(a) || push!(a.states, source(t))
-    event(t) in events(a) ||  push!(a.events, event(t))
-    target(t) in states(a) || push!(a.states, target(t))
+    source(t) in states(a) || add_state!(a, source(t))
+    event(t) in events(a) ||  add_event!(a, event(t))
+    target(t) in states(a) || add_state!(a, target(t))
     push!(a.transitions, t)
 end
-
 """Add set of transitions to the automaton."""
-function add_transitions!(a::Automaton, transitions)
-    for t in transitions
+function add_transitions!(a::Automaton, trans)
+    for t in trans
         typeof(t) == Transition || throw(ArgumentError("transitions requires a collection of ::Transition, error on: ($(source(t)),$(event(t)),$(target(t)))"))
         add_transition!(a, t)
     end
-    union!(a.transitions, transitions)
+    transitions(a)
 end
 """Remove a set of transitions from the automaton."""
 rem_transitions!(a::Automaton, transitions) = setdiff!(a.transitions, transitions)

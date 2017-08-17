@@ -48,6 +48,17 @@ ne(ta::TimedAutomaton) = ne(ta.automaton)
 transitions(ta::TimedAutomaton) = transitions(ta.automaton)
 """Return the number of transitions in an automaton."""
 nt(ta::TimedAutomaton) = nt(ta.automaton)
+"""Add one transition to the automaton."""
+function add_transition!(ta::TimedAutomaton, transition::Pair{Transition,Float64})
+    add_transition!(ta.automaton, transition[1])
+    push!(ta.durations, transition)
+end
+"""Add set of transitions to the automaton."""
+function add_transitions!(ta::TimedAutomaton, transitions::Dict{Transition,Float64})
+    for t in transitions
+        add_transition!(ta, t)
+    end
+end
 
 ##
 # Durations
