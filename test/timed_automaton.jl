@@ -9,7 +9,7 @@
 
 
 # Test the parameter values of newly created objects
-a = Automaton(states=1:2,events=[1,5],transitions=[(1,1,2),(2,5,1)], init=[1], marked=[2], uncontrollable=[5])
+a = Automaton(states=1:2,events=[1,5],transitions=[(1,1,2),(2,5,1)],init=[1],marked=[2],uncontrollable=[5])
 ta = TimedAutomaton(a,Dict((1,1,2)=>1,(2,5,1)=>3))
 @test nt(ta) == nt(a) == ns(ta) == ne(ta) == 2
 @test duration(ta,(1,1,2))*3 == duration(ta,(2,5,1)) == 3
@@ -30,6 +30,7 @@ d = Dict((1,1,2)=>1,(2,5,1)=>3)
 ta2 = TimedAutomaton(durations=d)
 @test ta2.automaton == a
 @test ta2.durations == d
+@test TimedAutomaton(Automaton(states=1:2,events=[5],init=[1],marked=[2],uncontrollable=[5]),Dict((1,1,2)=>1,(2,5,1)=>3)) == ta
 
 # Test the add functions
 a = Automaton(

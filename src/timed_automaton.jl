@@ -14,10 +14,13 @@ type TimedAutomaton
         )
 
         # Verify number of durations
-        if nt(automaton) == 0
-            length(durations) == 0 || throw(ArgumentError("Number of durations specified must equal number of events in the underlying automaton."))
+        if length(durations) == 0
+            nt(automaton) == 0 || throw(ArgumentError("Number of durations specified must be > than the number of transitions in the underlying automaton."))
         else
-            (length(durations) == length(automaton.transitions)) || throw(ArgumentError("Number of durations specified must equal number of transitions in the underlying automaton."))
+            (length(durations) >= length(automaton.transitions)) || throw(ArgumentError("Number of durations specified must be > than the number of transitions in the underlying automaton."))
+            for (t,d) in durations
+                t in transitions(automaton) || add_transition!(automaton, t)
+            end
         end
 
         new(automaton, durations)
