@@ -91,4 +91,5 @@ redirect_stdout(originalSTDOUT)
         marked: {2}
         controllable: {1}
         uncontrollable: {2}
+        disturbance: {}
     )"

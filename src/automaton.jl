@@ -14,6 +14,7 @@ type Automaton
     marked::IntSet
     controllable::IntSet
     uncontrollable::IntSet
+    disturbance::IntSet # disturbance ⊆ uncontrollable is events that is uncertain and can not be relied on in algorithms
 
     """Verify the input values of the automaton. Decreases efficiency of the code but improves debugging"""
     function Automaton(
@@ -22,7 +23,8 @@ type Automaton
             transitions = Set{Transition}(),
             init = IntSet(),
             marked = IntSet(),
-            uncontrollable = IntSet()
+            uncontrollable = IntSet(),
+            disturbance = IntSet()
         )
 
         # Verify transitions
@@ -32,28 +34,19 @@ type Automaton
             target in states || (states = union(states, target))
         end
 
-        # Verify init states
-        for q in init
-            (q in states) || (states = union(states, q))
-        end
+        states = union(IntSet(states), init)
+        states = union(IntSet(states), marked)
 
-        # Verify marked states
-        for q in marked
-            (q in states) || (states = union(states, q))
-        end
-
-        # Verify uncontrollable events
-        for e in uncontrollable
-            (e in events) || (events = union(events, e))
-        end
+        uncontrollable = union(IntSet(uncontrollable), disturbance)
+        events = union(IntSet(events), uncontrollable)
 
         controllable = setdiff(events, uncontrollable)
-        new(IntSet(states), IntSet(events), Set{Transition}(transitions), IntSet(init), IntSet(marked), IntSet(controllable), IntSet(uncontrollable))
+        new(IntSet(states), IntSet(events), Set{Transition}(transitions), IntSet(init), IntSet(marked), IntSet(controllable), IntSet(uncontrollable), IntSet(disturbance))
     end
 end
 Automaton(ns::Int) = Automaton(states = IntSet(1:ns))
-Automaton(ns::Int, ne::Int; transitions = Set{Transition}(), init = IntSet(), marked = IntSet(), uncontrollable = IntSet()) =
-    Automaton(states = IntSet(1:ns), events = IntSet(1:ne), transitions = transitions, init = init, marked = marked, uncontrollable = uncontrollable)
+Automaton(ns::Int, ne::Int; transitions = Set{Transition}(), init = IntSet(), marked = IntSet(), uncontrollable = IntSet(), disturbance = IntSet()) =
+    Automaton(states = IntSet(1:ns), events = IntSet(1:ne), transitions = transitions, init = init, marked = marked, uncontrollable = uncontrollable, disturbance = disturbance)
 
 ##
 # States
@@ -96,22 +89,28 @@ end
 events(a::Automaton) = a.events
 controllable(a::Automaton) = a.controllable
 uncontrollable(a::Automaton) = a.uncontrollable
+disturbance(a::Automaton) = a.disturbance
 """Return the number of events in an automaton."""
 ne(a::Automaton) = length(events(a))
 
 """Add one event to the automaton."""
-function add_event!(a::Automaton, event::Event, uncontrollable::Bool = false)
-    if uncontrollable
+function add_event!(a::Automaton, event::Event, uncontrollable::Bool = false; disturbance::Bool = false)
+    if uncontrollable || disturbance
         setdiff!(a.controllable, event)
         push!(a.uncontrollable, event)
+        if disturbance
+            push!(a.disturbance, event)
+        end
     else
         setdiff!(a.uncontrollable, event)
+        setdiff!(a.disturbance, event)
         push!(a.controllable, event)
     end
     push!(a.events, event)
 end
 """Add set of events to the automaton."""
-function add_events!(a::Automaton, events, uncontrollable::IntSet = IntSet())
+function add_events!(a::Automaton, events, uncontrollable::IntSet = IntSet(); disturbance::IntSet = IntSet())
+    union!(uncontrollable, disturbance)
     controllable = setdiff(events, uncontrollable)
     setdiff!(a.uncontrollable, controllable)
     union!(a.uncontrollable, uncontrollable)
@@ -123,6 +122,7 @@ end
 function rem_events!(a::Automaton, events)
     setdiff!(a.controllable, events)
     setdiff!(a.uncontrollable, events)
+    setdiff!(a.disturbance, events)
     setdiff!(a.events, events)
 end
 
@@ -180,6 +180,7 @@ function show(io::IO,a::Automaton)
         marked: {", join(a.marked, ","), "}
         controllable: {", join(a.controllable, ","), "}
         uncontrollable: {", join(a.uncontrollable, ","), "}
+        disturbance: {", join(a.disturbance, ","), "}
     )")
 end
 
