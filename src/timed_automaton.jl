@@ -45,6 +45,7 @@ marked(ta::TimedAutomaton) = marked(ta.automaton)
 events(ta::TimedAutomaton) = events(ta.automaton)
 controllable(ta::TimedAutomaton) = controllable(ta.automaton)
 uncontrollable(ta::TimedAutomaton) = uncontrollable(ta.automaton)
+disturbance(ta::TimedAutomaton) = disturbance(ta.automaton)
 """Return the number of events in an automaton."""
 ne(ta::TimedAutomaton) = ne(ta.automaton)
 """Return the transitions of an automaton."""
