@@ -95,6 +95,7 @@ function show(io::IO,ta::TimedAutomaton)
         marked: {", join(ta.automaton.marked, ","), "}
         controllable: {", join(ta.automaton.controllable, ","), "}
         uncontrollable: {", join(ta.automaton.uncontrollable, ","), "}
+        disturbance: {", join(ta.automaton.disturbance, ","), "}
     )")
 end
 
