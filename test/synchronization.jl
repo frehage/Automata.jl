@@ -2,9 +2,10 @@
 # Testset for the synchronization fucntions.
 ######################################
 
+###
+# Test the synchronization(::Automaton, ::Automaton)
+###
 a1 = Automaton(
-    states=1:4,
-    events=1:2,
     transitions=[
             (1,1,2),
             (2,1,3),
@@ -15,8 +16,6 @@ a1 = Automaton(
     marked=[3],
     uncontrollable=[2])
 a2 = Automaton(
-    states=1:3,
-    events=1:3,
     transitions=[
             (1,1,1),(1,3,3),
             (2,1,1),(2,2,2),
@@ -43,8 +42,6 @@ a4 = Automaton(
     init=[1],
     marked=[2])
 a5 = Automaton(
-    states=1:6,
-    events=1:3,
     transitions=[
             (1,1,2),(1,3,3),
             (2,1,2),(2,3,4),
@@ -62,3 +59,19 @@ a5 = Automaton(
 rem_events!(a3, [3])
 @test sync(a2,a3) == a5
 @test sync(a3,a2) == a5
+
+###
+# Test the synchronization(::TimedAutomaton, ::TimedAutomaton)
+###
+add_events!(a3, [3])
+ta1 = TimedAutomaton(a1, Dict(t=>1 for t in transitions(a1)))
+ta2 = TimedAutomaton(a2, Dict(t=>1 for t in transitions(a2)))
+ta3 = TimedAutomaton(a3, Dict(t=>1 for t in transitions(a3)))
+ta4 = TimedAutomaton(a4, Dict(t=>1 for t in transitions(a4)))
+ta5 = TimedAutomaton(a5, Dict(t=>1 for t in transitions(a5)))
+@test sync(ta1,ta1) == ta1
+@test sync(ta2,ta3) == ta4
+
+rem_events!(ta3.automaton, [3])
+@test sync(ta2,ta3) == ta5
+@test sync(ta3,ta2) == ta5

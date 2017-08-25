@@ -112,8 +112,13 @@ end
 function add_events!(a::Automaton, events, uncontrollable::IntSet = IntSet(); disturbance::IntSet = IntSet())
     union!(uncontrollable, disturbance)
     controllable = setdiff(events, uncontrollable)
+    # update uncontrollable
     setdiff!(a.uncontrollable, controllable)
     union!(a.uncontrollable, uncontrollable)
+    # update disturbance
+    setdiff!(a.disturbance, controllable)
+    union!(a.disturbance, disturbance)
+    # update controllable
     setdiff!(a.controllable, uncontrollable)
     union!(a.controllable, controllable)
     union!(a.events, events)

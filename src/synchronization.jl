@@ -1,7 +1,5 @@
-#(n1,Sigma1,T1,Qi1,n2,Sigma2,T2,Qi2,Sigma_s)                   # OK T 2016-12-20  R 2016-12-22
-# n1 = number of states in Q1, n2 = number of states in Q2
-# No states larger than ni are allowed in Qi and Ti i=1,2
-function sync(a::Automaton, b::Automaton)
+
+function sync(a::Automaton, b::Automaton, get_original::Bool = false)
 
     automaton = Automaton()
 
@@ -9,9 +7,10 @@ function sync(a::Automaton, b::Automaton)
     Sigma = union(events(a),events(b))
     Sigma12s = intersect(events(a),events(b))
     Sigma12u = union(uncontrollable(a),uncontrollable(b))
+    Sigma12d = union(disturbance(a),disturbance(b))
     Sigma1i = setdiff(events(a),Sigma12s)
     Sigma2i = setdiff(events(b),Sigma12s)
-    add_events!(automaton, Sigma, Sigma12u)
+    add_events!(automaton, Sigma, Sigma12u, disturbance=Sigma12d)
 
     # For each state in a and b, calculate outgoing events and outgoing states.
     Gamma1,Q1prime = outgoing_trans(a)
@@ -30,7 +29,7 @@ function sync(a::Automaton, b::Automaton)
     end
 
     # iterate until queue is empty
-    while !isempty(queue) && n < 10
+    while !isempty(queue)
         q1,q2 = dequeue!(queue)
         q12 = Q[(q1,q2)]
 
@@ -59,7 +58,41 @@ function sync(a::Automaton, b::Automaton)
             add_transition!(automaton, (q12,e,q12prime2))
         end
     end
-    automaton
+    if get_original
+        automaton, Q
+    else
+        automaton
+    end
+end
+
+"""
+    sync(ta1::TimedAutomaton, ta2::TimedAutomaton)
+
+Synchronization of ::TimedAutomaton. Only syncs on event and not on duration. If
+a transition in the synchronous composition activates a transitions in both  the
+automatons, the duration of both transitions is expected to have same duration.
+"""
+function sync(ta1::TimedAutomaton, ta2::TimedAutomaton)
+
+    automaton, Q = sync(ta1.automaton, ta2.automaton, true)
+    Q
+    Qi = Dict(v => k for (k,v) in Q)
+    dur = Dict{Transition,Float64}()
+    for trans in transitions(automaton)
+        if event(trans) in events(ta1)
+            t_original =  (first(Qi[source(trans)]),event(trans), first(Qi[target(trans)]))
+            d = duration(ta1, t_original)
+            1
+        else
+            t_original =  (last(Qi[source(trans)]),event(trans), last(Qi[target(trans)]))
+            d = duration(ta2, t_original)
+            2
+        end
+        push!(dur, trans=>d)
+    end
+    dur
+    ta = TimedAutomaton(automaton, dur)
+
 end
 
 function outgoing_trans(a::Automaton)       # OK RT 2016-12-18
