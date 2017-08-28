@@ -59,6 +59,7 @@ a5 = Automaton(
 rem_events!(a3, [3])
 @test sync(a2,a3) == a5
 @test sync(a3,a2) == a5
+@test sync(a5,Automaton(Automaton(init=[1],marked=[1]))) == a5
 @test_throws ArgumentError sync(a5,Automaton())
 
 ###
@@ -76,4 +77,5 @@ ta5 = TimedAutomaton(a5, Dict(t=>1 for t in transitions(a5)))
 rem_events!(ta3.automaton, [3])
 @test sync(ta2,ta3) == ta5
 @test sync(ta3,ta2) == ta5
+@test sync(ta5,TimedAutomaton(Automaton(init=[1],marked=[1]))) == ta5
 @test_throws ArgumentError sync(ta5,TimedAutomaton())
