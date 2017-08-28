@@ -1,6 +1,10 @@
 
 function sync(a::Automaton, b::Automaton, get_original::Bool = false)
 
+    msg = "Synchronization requires both automata to have at least one initial
+    state each error on:"
+    !isempty(init(a)) || throw(ArgumentError("$msg $a"))
+    !isempty(init(b)) || throw(ArgumentError("$msg $b"))
     automaton = Automaton()
 
     # Calculate events and add them to the new automaton
