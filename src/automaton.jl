@@ -159,10 +159,10 @@ function add_transitions!(a::Automaton, trans)
     end
     transitions(a)
 end
+"""Remove one transition from the automaton."""
+rem_transition!(a::Automaton, transition::Transition) = delete!(a.transitions, transition)
 """Remove a set of transitions from the automaton."""
 rem_transitions!(a::Automaton, transitions) = setdiff!(a.transitions, transitions)
-"""Remove one transition from the automaton."""
-rem_transition!(a::Automaton, transition::Transition) = rem_transitions!(a, Set{Transition}([transition]))
 
 ##
 # The default output format

@@ -63,6 +63,17 @@ function add_transitions!(ta::TimedAutomaton, transitions::Dict{Transition,Float
         add_transition!(ta, t)
     end
 end
+"""Remove one transition from the automaton."""
+function rem_transition!(ta::TimedAutomaton, transition::Transition)
+    delete!(ta.automaton.transitions, transition)
+    delete!(ta.durations, transition)
+end
+"""Remove a set of transitions from the automaton."""
+function rem_transitions!(ta::TimedAutomaton, transitions)
+    for t in transitions
+        rem_transition!(ta, t)
+    end
+end
 
 ##
 # Durations
