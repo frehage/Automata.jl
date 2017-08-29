@@ -189,12 +189,12 @@ function show(io::IO,a::Automaton)
     )")
 end
 
-function print_info(a::Automaton)
-    println("Automata.Automaton(
+function get_details(a::Automaton)
+    "Automata.Automaton(
         states: $(ns(a))
         events: $(ne(a))
         transitions: $(nt(a))
-    )")
+    )"
 end
 
 #=function plot(a::Automaton)

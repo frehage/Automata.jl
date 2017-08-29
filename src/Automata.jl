@@ -21,7 +21,7 @@ export
     transitions, nt, add_transition!, add_transitions!, rem_transition!, rem_transitions!,  # funcitons for transitions
     source,event,target, # elements in a transition
     init, marked, # lists init/marked states
-    print_info, # print only number of states, events and transitions. Used for large Automaton
+    get_details, # return only number of states, events and transitions. Used for large Automaton
 
     # TimedAutomaton
     TimedAutomaton, # type defs
