@@ -109,6 +109,7 @@ function show(io::IO,ta::TimedAutomaton)
         disturbance: {", join(ta.automaton.disturbance, ","), "}
     )")
 end
+print_info(ta::TimedAutomaton) = print_info(ta.automaton)
 
 # plot(ta::TimedAutomaton) = plot(ta.automaton)
 |
