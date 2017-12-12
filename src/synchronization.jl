@@ -32,6 +32,9 @@ function sync(a::Automaton, b::Automaton, get_original::Bool = false)
         enqueue!(queue, (q1,q2))
     end
 
+    max_s_a = maximum(states(a))
+    max_s_b = maximum(states(b))
+
     # iterate until queue is empty
     while !isempty(queue)
         q1,q2 = dequeue!(queue)
@@ -40,13 +43,13 @@ function sync(a::Automaton, b::Automaton, get_original::Bool = false)
         # look for feasible transitions of three type of events: (i) shared, (ii) local in a, (iii) local in b
         outtrans = Queue(Tuple{Event,State,State})
         for e in intersect(Sigma12s,Gamma1[q1],Gamma2[q2])
-            enqueue!(outtrans, (e, Q1prime[q1+ns(a)*e], Q2prime[q2+ns(b)*e]))
+            enqueue!(outtrans, (e, Q1prime[q1+max_s_a*e], Q2prime[q2+max_s_b*e]))
         end
         for e in intersect(Sigma1i,Gamma1[q1])
-            enqueue!(outtrans, (e, Q1prime[q1+ns(a)*e], q2))
+            enqueue!(outtrans, (e, Q1prime[q1+max_s_a*e], q2))
         end
         for e in intersect(Sigma2i,Gamma2[q2])
-            enqueue!(outtrans, (e, q1, Q2prime[q2+ns(b)*e]))
+            enqueue!(outtrans, (e, q1, Q2prime[q2+max_s_b*e]))
         end
         for (e,q1p,q2p) in outtrans
             q12prime1 = (q1p, q2p)
@@ -79,18 +82,21 @@ automatons, the duration of both transitions is expected to have same duration.
 function sync(ta1::TimedAutomaton, ta2::TimedAutomaton)
 
     automaton, Q = sync(ta1.automaton, ta2.automaton, true)
-    Q
     Qi = Dict(v => k for (k,v) in Q)
+
+    #println(automaton)
+
     dur = Dict{Transition,Float64}()
+
     for trans in transitions(automaton)
         if event(trans) in events(ta1)
             t_original =  (first(Qi[source(trans)]),event(trans), first(Qi[target(trans)]))
             d = duration(ta1, t_original)
-            1
+
         else
-            t_original =  (last(Qi[source(trans)]),event(trans), last(Qi[target(trans)]))
+            t_original =  (last(Qi[source(trans)]), event(trans), last(Qi[target(trans)]))
             d = duration(ta2, t_original)
-            2
+
         end
         push!(dur, trans=>d)
     end
@@ -103,10 +109,13 @@ function outgoing_trans(a::Automaton)       # OK RT 2016-12-18
     Gamma = Dict([(s, IntSet()) for s in states(a)])
     Qprime = Dict{Int128,State}()
 
+    max_s = maximum(states(a))
+
     for (s,e,t) in transitions(a)
-        se = Int128(s+ns(a)*e)
+        se = Int128(s+max_s*e)
         push!(Gamma[s],e)
         Qprime[se] = t
     end
+
     return Gamma,Qprime
 end
