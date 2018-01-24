@@ -190,11 +190,7 @@ function show(io::IO,a::Automaton)
 end
 
 function get_details(a::Automaton)
-    "Automata.Automaton(
-        states: $(ns(a))
-        events: $(ne(a))
-        transitions: $(nt(a))
-    )"
+    "Automata.Automaton( states: $(ns(a)) events: $(ne(a)) transitions: $(nt(a)))"
 end
 
 #=function plot(a::Automaton)
