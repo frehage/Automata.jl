@@ -2,7 +2,7 @@
 function sync(a::Automaton, b::Automaton, get_original::Bool = false)
 
     msg = "Synchronization requires both automata to have at least one initial
-    state each error on:"
+        state each error on:"
     !isempty(init(a)) || throw(ArgumentError("$msg $a"))
     !isempty(init(b)) || throw(ArgumentError("$msg $b"))
     automaton = Automaton()
@@ -34,23 +34,33 @@ function sync(a::Automaton, b::Automaton, get_original::Bool = false)
 
     max_s_a = maximum(states(a))
     max_s_b = maximum(states(b))
-
+    outtrans = Tuple{Event,State,State}[]
     # iterate until queue is empty
     while !isempty(queue)
         q1,q2 = dequeue!(queue)
         q12 = Q[(q1,q2)]
 
         # look for feasible transitions of three type of events: (i) shared, (ii) local in a, (iii) local in b
-        outtrans = Queue(Tuple{Event,State,State})
-        for e in intersect(Sigma12s,Gamma1[q1],Gamma2[q2])
-            enqueue!(outtrans, (e, Q1prime[q1+max_s_a*e], Q2prime[q2+max_s_b*e]))
+        empty!(outtrans)
+        for e in Gamma1[q1]
+            if e in Sigma12s && e in Gamma2[q2]
+                push!(outtrans, (e, Q1prime[q1+max_s_a*e], Q2prime[q2+max_s_b*e]))
+            end
         end
-        for e in intersect(Sigma1i,Gamma1[q1])
-            enqueue!(outtrans, (e, Q1prime[q1+max_s_a*e], q2))
+        for  e in Gamma1[q1]
+            if e in Sigma1i
+                push!(outtrans, (e, Q1prime[q1+max_s_a*e], q2))
+            end
         end
-        for e in intersect(Sigma2i,Gamma2[q2])
-            enqueue!(outtrans, (e, q1, Q2prime[q2+max_s_b*e]))
+        for e in Gamma2[q2]
+            if e in Sigma2i
+                push!(outtrans, (e, q1, Q2prime[q2+max_s_b*e]))
+            end
         end
+
+
+
+
         for (e,q1p,q2p) in outtrans
             q12prime1 = (q1p, q2p)
             if !haskey(Q,q12prime1)
@@ -58,10 +68,10 @@ function sync(a::Automaton, b::Automaton, get_original::Bool = false)
                 Q[q12prime1] = n
                 enqueue!(queue, q12prime1)
                 q12prime2 = n
+                add_state!(automaton, q12prime2, false, (q1p in marked(a) && q2p in marked(b)))
             else
                 q12prime2 = Q[q12prime1]
             end
-            add_state!(automaton, q12prime2, (q1p in init(a) && q2p in init(b)), (q1p in marked(a) && q2p in marked(b)))
             add_transition!(automaton, (q12,e,q12prime2))
         end
     end
