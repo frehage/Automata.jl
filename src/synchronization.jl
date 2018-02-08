@@ -99,14 +99,18 @@ function sync(ta1::TimedAutomaton, ta2::TimedAutomaton)
     dur = Dict{Transition,Float64}()
 
     for trans in transitions(automaton)
-        if event(trans) in events(ta1)
+        if event(trans) in events(ta1) && event(trans) in events(ta2)
+            t1 =  (first(Qi[source(trans)]),event(trans), first(Qi[target(trans)]))
+            t2 =  (last(Qi[source(trans)]), event(trans), last(Qi[target(trans)]))
+            d = max(duration(ta1, t1),duration(ta2, t2))
+        else
+            if event(trans) in events(ta1)
             t_original =  (first(Qi[source(trans)]),event(trans), first(Qi[target(trans)]))
             d = duration(ta1, t_original)
-
-        else
-            t_original =  (last(Qi[source(trans)]), event(trans), last(Qi[target(trans)]))
-            d = duration(ta2, t_original)
-
+            else
+                t_original =  (last(Qi[source(trans)]), event(trans), last(Qi[target(trans)]))
+                d = duration(ta2, t_original)
+            end
         end
         push!(dur, trans=>d)
     end
